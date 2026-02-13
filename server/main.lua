@@ -1,0 +1,2 @@
+-- Nothing specific needed here for basic functionality
+-- This file can be used for future server-side commands or admin features
