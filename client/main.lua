@@ -1,4 +1,5 @@
 local zones = {}
+local inParkingZone = {}
 
 CreateThread(function()
     -- Create garage zones
@@ -80,9 +81,11 @@ CreateThread(function()
         )
         
         parkingZone:onPlayerInOut(function(isPointInside)
+            inParkingZone[garageName] = isPointInside
+            
             if isPointInside then
                 CreateThread(function()
-                    while isPointInside do
+                    while inParkingZone[garageName] do
                         Wait(0)
                         if Config.DrawMarker then
                             DrawMarker(
@@ -117,7 +120,7 @@ CreateThread(function()
                                 
                                 if IsControlJustReleased(0, 38) then -- E key
                                     local vehicle = GetVehiclePedIsIn(playerPed, false)
-                                    local plate = GetVehicleNumberPlateText(vehicle)
+                                    local plate = string.gsub(GetVehicleNumberPlateText(vehicle), "^%s*(.-)%s*$", "%1")
                                     local props = GetVehicleProps(vehicle)
                                     
                                     -- Check if vehicle type matches garage type
@@ -267,5 +270,6 @@ AddEventHandler("onResourceStop", function(resource)
             zone:destroy()
         end
         DeletePreviewVehicle()
+        inParkingZone = {}
     end
 end)
