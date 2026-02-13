@@ -40,8 +40,8 @@ function FetchImpoundedUserVehicles(source, impound)
 end
 
 function SpawnVehicle(src, plate, userVehicle, garage, impound)
-    print(plate, OutVehicles[plate], NetworkGetEntityFromNetworkId(OutVehicles[plate]),
-        DoesEntityExist(NetworkGetEntityFromNetworkId(OutVehicles[plate])))
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     if
         OutVehicles[plate] and
         NetworkGetEntityFromNetworkId(OutVehicles[plate]) ~= 0 and
@@ -61,6 +61,8 @@ function SpawnVehicle(src, plate, userVehicle, garage, impound)
 end
 
 function ParkVehicle(source, vehicleEntity, plate, garage, props)
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     if not DoesEntityExist(vehicleEntity) then return end
     DeleteEntity(vehicleEntity)
     MySQL.update("UPDATE player_vehicles SET state = ?, garage = ?, mods = ? WHERE plate = ?", {
@@ -74,6 +76,8 @@ function ParkVehicle(source, vehicleEntity, plate, garage, props)
 end
 
 function FavoriteVehicle(source, plate, isFavorite, garage)
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     MySQL.update.await("UPDATE player_vehicles SET isFavorite = ? WHERE plate = ?", {
         isFavorite and 1 or 0,
         plate
@@ -93,6 +97,8 @@ end
 ---@param source any Player source
 ---@param plate string Vehicle plate
 function GetUserOwnedVehicle(source, plate)
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     local query = "SELECT * FROM player_vehicles WHERE citizenid = @citizenid AND plate = @plate"
     local res = MySQL.query.await(query, {
         ["@citizenid"] = QBCore.Functions.GetPlayer(source).PlayerData.citizenid,
@@ -122,7 +128,8 @@ end
 
 function ImpoundVehicle(plate, impound)
     if not plate then return end
-
+    
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
     impound = impound or next(Config.Impounds)
 
     MySQL.update("UPDATE player_vehicles SET state = ?, garage = ? WHERE plate = ?", { 0, impound, plate })
@@ -132,6 +139,7 @@ exports("ImpoundVehicle", ImpoundVehicle)
 
 RegisterNetEvent("modular-garages:server:vehicleSpawned", function(plate, vehicleEntity)
     if not plate or not vehicleEntity then return end
-
+    
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
     OutVehicles[plate] = vehicleEntity
 end)
