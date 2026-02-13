@@ -1,0 +1,2 @@
+-- No commands needed for basic functionality
+-- This file can be used for future client-side debug commands
