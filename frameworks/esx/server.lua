@@ -40,6 +40,8 @@ function FetchImpoundedUserVehicles(source, impound)
 end
 
 function SpawnVehicle(src, plate, userVehicle, garage, impound)
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     if
         OutVehicles[plate] and
         NetworkGetEntityFromNetworkId(OutVehicles[plate]) ~= 0 and
@@ -58,6 +60,8 @@ function SpawnVehicle(src, plate, userVehicle, garage, impound)
 end
 
 function ParkVehicle(source, vehicleEntity, plate, garage, props)
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     if not DoesEntityExist(vehicleEntity) then return end
     DeleteEntity(vehicleEntity)
     MySQL.update("UPDATE owned_vehicles SET stored = ?, parking = ?, vehicle = ? WHERE plate = ?", {
@@ -71,6 +75,8 @@ function ParkVehicle(source, vehicleEntity, plate, garage, props)
 end
 
 function FavoriteVehicle(source, plate, isFavorite, garage)
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     MySQL.update.await("UPDATE owned_vehicles SET isFavorite = ? WHERE plate = ?", {
         isFavorite and 1 or 0,
         plate
@@ -91,6 +97,8 @@ end
 ---@param source any Player source
 ---@param plate string Vehicle plate
 function GetUserOwnedVehicle(source, plate)
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
+    
     local query = "SELECT * FROM owned_vehicles WHERE owner = @owner AND plate = @plate"
     local res = MySQL.query.await(query, {
         ["@owner"] = ESX.GetPlayerFromId(source).identifier,
@@ -120,7 +128,8 @@ end
 
 function ImpoundVehicle(plate, impound)
     if not plate then return end
-
+    
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
     impound = impound or next(Config.Impounds)
 
     MySQL.update("UPDATE owned_vehicles SET stored = ?, parking = ?, pound = ? WHERE plate = ?", {
@@ -135,6 +144,7 @@ exports("ImpoundVehicle", ImpoundVehicle)
 
 RegisterNetEvent("modular-garages:server:vehicleSpawned", function(plate, vehicleEntity)
     if not plate or not vehicleEntity then return end
-
+    
+    plate = string.gsub(plate, "^%s*(.-)%s*$", "%1") -- Trim spaces
     OutVehicles[plate] = vehicleEntity
 end)
